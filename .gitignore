@@ -1,0 +1,31 @@
+# 通用规则
+*.log
+*.tmp
+*.swp
+
+# 编译产物
+dist/
+build/
+target/
+
+# 依赖目录
+node_modules/
+venv/
+vendor/
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# IDE 配置
+.vscode/
+.idea/
+*.iml
+
+# 环境配置
+.env
+!.env.example
+
+# 特殊文件
+/secrets/
+*.pem

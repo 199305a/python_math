@@ -1,0 +1,61 @@
+{
+  "user_info": {
+    "user_id": "U20231015001",
+    "username": "alice_zhang",
+    "email": "alice.zhang@example.com",
+    "registration_date": "2023-01-15",
+    "profile": {
+      "full_name": "Alice Zhang",
+      "age": 30,
+      "location": {
+        "city": "Shanghai",
+        "country": "China"
+      },
+      "preferences": ["technology", "reading", "travel"]
+    }
+  },
+  "order_history": [
+    {
+      "order_id": "O20231001001",
+      "order_date": "2023-10-01",
+      "items": [
+        {
+          "product_id": "P001",
+          "product_name": "Wireless Bluetooth Headphones",
+          "price": 199.99,
+          "quantity": 1
+        },
+        {
+          "product_id": "P003",
+          "product_name": "USB-C Fast Charger",
+          "price": 29.99,
+          "quantity": 2
+        }
+      ],
+      "total_amount": 259.97,
+      "status": "delivered"
+    },
+    {
+      "order_id": "O20231010002",
+      "order_date": "2023-10-10",
+      "items": [
+        {
+          "product_id": "P002",
+          "product_name": "10.5-inch Tablet",
+          "price": 399.99,
+          "quantity": 1
+        }
+      ],
+      "total_amount": 399.99,
+      "status": "shipped"
+    }
+  ],
+  "settings": {
+    "notifications": {
+      "email": true,
+      "sms": false
+    },
+    "language": "en-US",
+    "theme": "dark_mode"
+  }
+}

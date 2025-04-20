@@ -1,0 +1,4 @@
+用户ID,用户名,邮箱,注册日期,全名,年龄,城市,国家,偏好
+U20231015001,alice_zhang,alice.zhang@example.com,2023-01-15,Alice Zhang,30,Shanghai,China,科技;阅读;旅行
+U20231015002,bob_li,bob.li@example.com,2023-02-20,Bob Li,28,Beijing,China,运动;摄影;编程
+U20231015003,charlie_wang,charlie.wang@example.com,2023-03-25,Charlie Wang,35,Guangzhou,China,音乐;写作;咖啡

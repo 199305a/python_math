@@ -287,4 +287,3 @@ def update_memory(state:MessagesState,config:RunnableConfig,*,store:BaseStore):
      return {"messages":[f"我记得你喜欢吃{memories[-1].value['food_perference']}"]}
  
 
-     

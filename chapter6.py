@@ -6,6 +6,7 @@ import os
 from langchain_openai import ChatOpenAI
 
 from langgraph.graph import StateGraph, START, END, MessagesState
+from langgraph.prebuilt import ToolNode, tools_condition
 
 load_dotenv(".env")
 
@@ -273,7 +274,7 @@ memories = in_memory_store.search(namespace_for_memory)
 
 print(memories[-1].dict)
 
-#一起使用
+# 一起使用
 
 from langchain.schema.runnable.config import RunnableConfig
 from langgraph.store.base import BaseStore
@@ -285,5 +286,3 @@ def update_memory(state:MessagesState,config:RunnableConfig,*,store:BaseStore):
      memories = store.search(namespace_for_memory)
      
      return {"messages":[f"我记得你喜欢吃{memories[-1].value['food_perference']}"]}
- 
-

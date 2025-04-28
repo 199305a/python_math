@@ -144,10 +144,10 @@ def weather_subgraph_node(state: ReActAgentState):
 def new_subgraph_node(state: ReActAgentState):
     """
     Creates a new subgraph node with news content.
-    
+
     Args:
         state (ReActAgentState): The current state of the ReAct agent.
-    
+
     Returns:
         dict: A dictionary containing a message with news content.
     """
@@ -156,8 +156,11 @@ def new_subgraph_node(state: ReActAgentState):
 
 def generate_recommendation_node(state: ReActAgentState):
     return {"message": "推荐的书籍是：一般书籍"}
+
+
 def movie_recommendation_node(state: ReActAgentState):
     return {"message": "推荐的书籍是：电影"}
+
 
 def update_memory_node(state: ReActAgentState):
 
@@ -198,9 +201,7 @@ movie_subgraph_builder.set_entry_point("movie_recommendation_node")
 movie_subgraph = movie_subgraph_builder.compile()
 
 memory_update_builder = StateGraph(ReActAgentState)
-memory_update_builder.add_node(
-    "update_memory_node", update_memory_node
-)
+memory_update_builder.add_node("update_memory_node", update_memory_node)
 memory_update_builder.set_entry_point("update_memory_node")
 memory_update_subgraph = memory_update_builder.compile()
 
@@ -231,7 +232,7 @@ react_agent_graph = parent_builder.compile()
 checkpointer = MemorySaver()
 
 
-inputs_weather = {"message": "今天天气怎么样","memory": {}}
+inputs_weather = {"message": "今天天气怎么样", "memory": {}}
 result_weather = react_agent_graph.invoke(inputs_weather)
 print(result_weather["message"])
 # inputs_news = {"message": "今天有什么新闻"}
@@ -249,15 +250,16 @@ inputs_recommendation2 = {"message": "推荐一本书", "memory": {"爱好": "�
 result_recommendation2 = react_agent_graph.invoke(inputs_recommendation2)
 print(result_recommendation2["message"])
 
+
 # 定义price agent
-def get_demand_data(product_id:str)->dict:
+def get_demand_data(product_id: str) -> dict:
     """
     Get demand data for a product.
     """
     return {"product_id": product_id, "demand_level": "high"}
 
 
-def get_competitor_price(product_id:str)->dict:
+def get_competitor_price(product_id: str) -> dict:
     """
     Get competitor price for a product.
     """
@@ -268,7 +270,10 @@ tools = [get_demand_data, get_competitor_price]
 
 graph = create_react_agent(model=model, tools=tools)
 
-initial_messages = [("system","你是一个AI代理，可以根据市场需求和竞争对手的价格动态调整产品价格"),("user","请告诉我产品 12345 的价格")]
+initial_messages = [
+    ("system", "你是一个AI代理，可以根据市场需求和竞争对手的价格动态调整产品价格"),
+    ("user", "请告诉我产品 12345 的价格"),
+]
 
 inputs = {"messages": initial_messages}
 
@@ -278,21 +283,25 @@ inputs = {"messages": initial_messages}
 #         print(messages)
 #     else:
 #         messages.pretty_print()
-from typing import Annotated, Sequence, TypedDict    
-from langchain_core.messages import BaseMessage     
-from langgraph.graph.message import add_messages  
+from typing import Annotated, Sequence, TypedDict
+from langchain_core.messages import BaseMessage
+from langgraph.graph.message import add_messages
+
+
 class AgentState(TypedDict):
-    message: Annotated[Sequence[BaseMessage],add_messages]
+    message: Annotated[Sequence[BaseMessage], add_messages]
+
 
 from langchain_core.tools import tool
 from textblob import TextBlob
+
 
 @tool
 def analyze_sentiment(feeback: str) -> str:
     """
     Analyze the sentiment of the given text.
     """
-    analysis = TextBlob(feeback) 
+    analysis = TextBlob(feeback)
     if analysis.sentiment.polarity > 0.5:
         return "正面情感"
     elif analysis.sentiment.polarity == 0.5:
@@ -305,7 +314,7 @@ def analyze_sentiment(feeback: str) -> str:
 def respond_based_on_sentiment(sentiment: str) -> str:
     """
     Respond based on the sentiment of the feedback.
-    """    
+    """
     if sentiment == "正面情感":
         return "谢谢你的积极反馈！"
     elif sentiment == "中性情感":
@@ -313,12 +322,15 @@ def respond_based_on_sentiment(sentiment: str) -> str:
     else:
         return "我们会努力改进！"
 
+
 tools = [analyze_sentiment, respond_based_on_sentiment]
 llm = model.bind_tools(tools)
 
 tools_by_name = {tool.name: tool for tool in tools}
 
-from langchain_core.messages import ToolMessage,SystemMessage
+from langchain_core.messages import ToolMessage, SystemMessage
+
+
 def tool_node(state: AgentState):
     """
     Tool node that selects the appropriate tool based on the state.
@@ -328,30 +340,33 @@ def tool_node(state: AgentState):
         tool_name = tool_call["name"]
         tool = tools_by_name[tool_name]
         output = tool.invoke(tool_call["args"])
-        outputs.append(ToolMessage(content=json.dumps(output),tool_call_id=tool_call["id"],name=tool_name))
-         
+        outputs.append(
+            ToolMessage(
+                content=json.dumps(output), tool_call_id=tool_call["id"], name=tool_name
+            )
+        )
+
         return {"message": outputs}
 
 
 from langchain_core.runnables import RunnableConfig
 
-def call_model(state: AgentState,config: RunnableConfig):
+
+def call_model(state: AgentState, config: RunnableConfig):
     """
     Call the model with the current state.
     """
-    system_prompt = SystemMessage(
-        content="你是一个AI助手，负责处理用户的反馈信息。"
-        
-    )
-    response = llm.invoke([system_prompt]+state["message"],config)
-    return {"message": [response]} 
+    system_prompt = SystemMessage(content="你是一个AI助手，负责处理用户的反馈信息。")
+    response = llm.invoke([system_prompt] + state["message"], config)
+    return {"message": [response]}
+
 
 def should_continue(state: AgentState):
     """
     Check if the conversation should continue.
     """
     last_message = state["message"][-1]
-    if  not last_message.tool_calls:
+    if not last_message.tool_calls:
         return "end"
     else:
         return "continue"
@@ -375,21 +390,24 @@ graph = workflow.compile()
 
 initial_state = {"message": [("user", "产品很棒，我不喜欢")]}
 
+
 def print_stream(stream):
     for state in stream:
-        messages  = state["message"][-1]
+        messages = state["message"][-1]
         if isinstance(messages, tuple):
             print(messages)
         else:
             messages.pretty_print()
 
+
 # print_stream(graph.stream(initial_state, stream_mode="values"))
 
+
 class RecommendationState(TypedDict):
-    user_id:str
-    preference:str
-    reasoning:str
-    recommendation:str
+    user_id: str
+    preference: str
+    reasoning: str
+    recommendation: str
     memory: str
 
 
@@ -399,7 +417,7 @@ def recommendation_product(user_id: str, preference: str) -> str:
     Recommend a product based on user ID and preference.
     """
     # Simulate a recommendation process
-    return f"推荐的产品是：{preference}，用户ID：{user_id}"    
+    return f"推荐的产品是：{preference}，用户ID：{user_id}"
 
 
 from openai import OpenAI
@@ -407,12 +425,12 @@ from openai import OpenAI
 # 初始化客户端，指向 Ollama 的本地服务
 client = OpenAI(
     base_url="http://localhost:11434/v1",  # Ollama API 地址
-    api_key="ollama",  # Ollama 默认无需真实 API Key，填任意值即可
+    api_key="sk-gyahfpcjgxhqrrxumiexpffhjfjsyyybtipwvswbxvanehel",  # Ollama 默认无需真实 API Key，填任意值即可
 )
 
 # 发送请求
 response = client.chat.completions.create(
-    model="deepseek-r1",  # 指定模型
+    model="Gemma3:4b",  # 指定模型
     messages=[
         {"role": "system", "content": "你是一个有帮助的助手。"},
         {"role": "user", "content": "你好，什么是大模型？"},
